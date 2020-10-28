@@ -432,7 +432,7 @@ class OpenCVConan(ConanFile):
 
         # system libraries
         if self.settings.os == 'Linux':
-            cmake.definitions['WITH_GTK'] = self.options.gtk is not None
+            cmake.definitions['WITH_GTK'] = self.options.gtk != None
             cmake.definitions['WITH_GTK_2_X'] = self.options.gtk == 2
 
         if self.settings.os == 'Android':
