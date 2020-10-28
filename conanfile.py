@@ -432,7 +432,7 @@ class OpenCVConan(ConanFile):
 
         # system libraries
         if self.settings.os == 'Linux':
-            cmake.definitions['WITH_GTK'] = self.options.gtk != None
+            cmake.definitions['WITH_GTK'] = self.options.gtk != None and self.options.gtk != "None"
             cmake.definitions['WITH_GTK_2_X'] = self.options.gtk == 2
 
         if self.settings.os == 'Android':
@@ -440,6 +440,10 @@ class OpenCVConan(ConanFile):
 
         if str(self.settings.os) in ["iOS", "watchOS", "tvOS"]:
             cmake.definitions['IOS'] = True
+
+        cmake_bool_keys = [key for key in cmake.definitions if cmake.definitions[key] is bool]
+        for key in cmake_bool_keys:
+            cmake.defintions[key] = "ON" if cmake.definitions[key] else "OFF"
 
         cmake.configure(build_folder=self._build_subfolder)
         self._cmake = cmake
