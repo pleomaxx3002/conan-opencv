@@ -118,6 +118,8 @@ class OpenCVConan(ConanFile):
             if tools.os_info.with_apt:
                 installer = tools.SystemPackageTool()
                 packages = []
+                if self.options.dc1394:
+                    packages.append("libdc1394-22-dev")
                 if self.options.gtk == 2:
                     packages.append('libgtk2.0-dev')
                 elif self.options.gtk == 3:
@@ -127,6 +129,8 @@ class OpenCVConan(ConanFile):
             elif tools.os_info.with_yum:
                 installer = tools.SystemPackageTool()
                 packages = []
+                if self.options.dc1394:
+                    packages.append("libdc1394-devel")
                 if self.options.gtk == 2:
                     packages.append('gtk2-devel')
                 elif self.options.gtk == 3:
@@ -282,16 +286,16 @@ class OpenCVConan(ConanFile):
         cmake.definitions['OPENCV_FORCE_3RDPARTY_BUILD'] = False
 
         # IEEE1394
-        cmake.definitions["WITH_1394"] = self.options.dc1394
+        cmake.definitions["WITH_1394"] = self.options.dc1394 == True
 
         # NVidia Carotene
-        cmake.definitions['WITH_CAROTENE'] = self.options.carotene
+        cmake.definitions['WITH_CAROTENE'] = self.options.carotene == True
 
         # Eigen
-        cmake.definitions['WITH_EIGEN'] = self.options.eigen
+        cmake.definitions['WITH_EIGEN'] = self.options.eigen == True
 
         # FFMPEG
-        cmake.definitions['WITH_FFMPEG'] = self.options.ffmpeg
+        cmake.definitions['WITH_FFMPEG'] = self.options.ffmpeg == True
         if self.options.ffmpeg:
             cmake.definitions['HAVE_FFMPEG'] = True
             cmake.definitions['HAVE_FFMPEG_WRAPPER'] = False
@@ -305,7 +309,7 @@ class OpenCVConan(ConanFile):
             cmake.definitions['FFMPEG_INCLUDE_DIRS'] = ';'.join(self._gather_include_paths('ffmpeg'))
 
         # GStreamer
-        cmake.definitions['WITH_GSTREAMER'] = self.options.gstreamer
+        cmake.definitions['WITH_GSTREAMER'] = self.options.gstreamer == True
         if self.options.gstreamer:
             cmake.definitions['HAVE_GSTREAMER'] = True
             cmake.definitions['GSTREAMER_VERSION'] = self.deps_cpp_info['gstreamer'].version
@@ -339,10 +343,10 @@ class OpenCVConan(ConanFile):
 
         # JPEG
         cmake.definitions['BUILD_JPEG'] = False
-        cmake.definitions['WITH_JPEG'] = self.options.jpeg
+        cmake.definitions['WITH_JPEG'] = self.options.jpeg == True
 
         # LAPACK
-        cmake.definitions['WITH_LAPACK'] = self.options.lapack
+        cmake.definitions['WITH_LAPACK'] = self.options.lapack == True
         if self.options.lapack:
             cmake.definitions['LAPACK_CBLAS_H'] = 'cblas.h'
             cmake.definitions['LAPACK_IMPL'] = 'LAPACK/Generic'
@@ -362,15 +366,15 @@ class OpenCVConan(ConanFile):
 
         # PNG
         cmake.definitions['BUILD_PNG'] = False
-        cmake.definitions['WITH_PNG'] = self.options.png
+        cmake.definitions['WITH_PNG'] = self.options.png == True
 
         # Protobuf
         cmake.definitions['BUILD_PROTOBUF'] = False
         cmake.definitions['PROTOBUF_UPDATE_FILES'] = False
-        cmake.definitions['WITH_PROTOBUF'] = self.options.protobuf
+        cmake.definitions['WITH_PROTOBUF'] = self.options.protobuf == True
         if self.options.protobuf and self.settings.compiler == 'Visual Studio' and self.options.shared:
             # this relies on CMake's bundled FindProtobuf.cmake
-            cmake.definitions['Protobuf_USE_STATIC_LIBS'] = not self.options['protobuf'].shared
+            cmake.definitions['Protobuf_USE_STATIC_LIBS'] = not self.options['protobuf'].shared == True
         if self.options.protobuf and self.settings.os == 'Android':
             # add the log library as dependency of protobuf
             cmake.definitions['CONAN_OPENCV_PROTOBUF_DEPENDENCIES'] = 'log'
@@ -380,11 +384,11 @@ class OpenCVConan(ConanFile):
         cmake.definitions['WITH_TBB'] = False
 
         # quirc
-        cmake.definitions['WITH_QUIRC'] = self.options.quirc
+        cmake.definitions['WITH_QUIRC'] = self.options.quirc == True
 
         # TIFF
         cmake.definitions['BUILD_TIFF'] = False
-        cmake.definitions['WITH_TIFF'] = self.options.tiff
+        cmake.definitions['WITH_TIFF'] = self.options.tiff == True
         if self.options.tiff:
             cmake.definitions['TIFF_FOUND'] = True
             # TIFF_INCLUDE_DIR is used to parse version from tiff.h
@@ -393,13 +397,13 @@ class OpenCVConan(ConanFile):
 
         # WebP
         cmake.definitions['BUILD_WEBP'] = False
-        cmake.definitions['WITH_WEBP'] = self.options.webp
+        cmake.definitions['WITH_WEBP'] = self.options.webp == True
 
         # zlib
         cmake.definitions['BUILD_ZLIB'] = False
 
         # NVidia CUDA
-        cmake.definitions['WITH_CUDA'] = self.options.cuda
+        cmake.definitions['WITH_CUDA'] = self.options.cuda == True
         # This allows compilation on older GCC/NVCC, otherwise build errors.
         cmake.definitions['CUDA_NVCC_FLAGS'] = '--expt-relaxed-constexpr'
 
@@ -412,7 +416,7 @@ class OpenCVConan(ConanFile):
         # opencv-conrib modules
         if self.options.contrib:
             cmake.definitions['OPENCV_EXTRA_MODULES_PATH'] = os.path.join(self.build_folder, 'contrib', 'modules')
-            cmake.definitions['OPENCV_ENABLE_NONFREE'] = self.options.nonfree
+            cmake.definitions['OPENCV_ENABLE_NONFREE'] = self.options.nonfree == True
 
             # OpenCV doesn't use find_package for freetype & harfbuzz, so let's specify them
             if self.options.freetype:
@@ -432,7 +436,7 @@ class OpenCVConan(ConanFile):
 
         # system libraries
         if self.settings.os == 'Linux':
-            cmake.definitions['WITH_GTK'] = self.options.gtk != None and self.options.gtk != "None"
+            cmake.definitions['WITH_GTK'] = self.options.gtk != "None"
             cmake.definitions['WITH_GTK_2_X'] = self.options.gtk == 2
 
         if self.settings.os == 'Android':
