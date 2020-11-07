@@ -358,7 +358,7 @@ class OpenCVConan(ConanFile):
         # OpenEXR
         cmake.definitions['BUILD_OPENEXR'] = False
         if not tools.cross_building(self.settings):
-            cmake.definitions['WITH_OPENEXR'] = self.options.openexr
+            cmake.definitions['WITH_OPENEXR'] = self.options.openexr == True
             if self.options.openexr:
                 cmake.definitions['OPENEXR_ROOT'] = self.deps_cpp_info['openexr'].rootpath
         else:
@@ -445,7 +445,7 @@ class OpenCVConan(ConanFile):
         if str(self.settings.os) in ["iOS", "watchOS", "tvOS"]:
             cmake.definitions['IOS'] = True
 
-        cmake_bool_keys = [key for key in cmake.definitions if cmake.definitions[key] is bool]
+        cmake_bool_keys = [key for key in cmake.definitions if isinstance(cmake.definitions[key], bool)]
         for key in cmake_bool_keys:
             cmake.defintions[key] = "ON" if cmake.definitions[key] else "OFF"
 
