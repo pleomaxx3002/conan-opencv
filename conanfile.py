@@ -447,7 +447,7 @@ class OpenCVConan(ConanFile):
 
         cmake_bool_keys = [key for key in cmake.definitions if isinstance(cmake.definitions[key], bool)]
         for key in cmake_bool_keys:
-            cmake.defintions[key] = "ON" if cmake.definitions[key] else "OFF"
+            cmake.definitions[key] = "ON" if cmake.definitions[key] else "OFF"
 
         cmake.configure(build_folder=self._build_subfolder)
         self._cmake = cmake
